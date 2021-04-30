@@ -1,9 +1,10 @@
+
+@import "src/scss/shared/index";
+
 .App{
-  max-width: 500px;
-  margin: auto ;
-  padding: 0 40px;
   font-family: Roboto;
   font-weight: 400;
+  background: #fafafa;
 }
 
 .addTodo_component{

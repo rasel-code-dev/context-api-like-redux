@@ -10,7 +10,9 @@ function Provider(HOC){
     
     const [state, setState] = React.useState(  {
       name: "Rasel Mahmud",
-      todos: [{title: "Get up at 6'O Clock", id: 1}]
+      todos: [{title: "Get up at 6'O Clock", id: 1}],
+      users: [],
+      posts: [],
     })
 
     
@@ -18,6 +20,7 @@ function Provider(HOC){
     // so that out state globally updated
     function callback(updateState){
       setState(updateState)
+      return updateState
     }
     
     return (

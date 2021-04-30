@@ -4,5 +4,5 @@ import reactRefresh from '@vitejs/plugin-react-refresh'
 
 export default defineConfig({
   plugins: [reactRefresh()],
-  base: "Context-Api-like-redux-implement"
+  base: "context-api-like-redux-implement"
 })

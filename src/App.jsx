@@ -5,11 +5,18 @@ import './App.scss'
 import connect from "./context/connect"
 import ViewTodos from "./components/ViewTodos";
 import AddTodo from "./components/AddTodo";
+import {fetchUser, fetchPosts} from "./context/actions";
 
 
 function App(props) {
   
-  console.log("state from app", props)
+  
+  React.useEffect(()=>{
+    props.fetchUser()
+    props.fetchPosts()
+  }, [])
+  
+  console.log("app", props)
   return (
     <div className="App">
         <ConnectedAnotherCom2/>
@@ -31,4 +38,4 @@ const AnotherCom2 = (props)=>{
 
 const ConnectedAnotherCom2 = connect(AnotherCom2)
 
-export default connect(App)
+export default connect(App, { fetchUser, fetchPosts })

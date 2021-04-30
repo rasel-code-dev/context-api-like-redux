@@ -14,9 +14,13 @@ When Out App Growth Big then we need to use redux like library to keep state, ac
 actually from my experience, I use context api when my application need 
 globally state but it not more complex.
 Like store **Authentication**, **posts**, **small blog site**.
-my portfolio site use context api to manage my site.   
+my portfolio site use context api to manage my site.  
+
+#### It Supports Async Action
 
 
+github page
+https://rasel-code-dev.github.io/context-api-like-redux-implement
 #Application Preview
 ![application preview](preview.gif)
 
@@ -59,6 +63,7 @@ function Provider(HOC){
         // so that out state globally updated
         function callback(updateState){
           setState(updateState)
+          return updateState // it return new updared state..
         }
         
         return (
@@ -71,8 +76,6 @@ function Provider(HOC){
 export default Provider
 ```
 Use Provider inside main.js
-
-
 ```jsx
 //main.js
 import {BrowserRouter} from "react-router-dom";
@@ -95,6 +98,60 @@ ReactDOM.render(
 ## well. we provide our Context With Another Anonymous Functional Component State that's Reactive.
 <p>And we pass a callback function that take newState and update out reactive (state) and all component will be updated.</p>
 
+## Now Create connect.jsx HigherOrder function like react-redux connect.
+## It Just Wrapper of Context Consumer. 
+### if you access your global state. then you simply wrap connect HOC with this component, and it helps action dispatch.
+```jsx
+// connect.jsx
+import React, {useContext} from "react";
+
+const defaultValue = {name: "rasel"}
+export const MyContext = React.createContext(defaultValue);
+
+function connect(HOC, actions){
+  return function (props){
+    
+    let state = useContext(MyContext)
+    
+    function actionsFn(){
+      return actionsFnWithDispatch()
+    }
+    
+    function actionsFnWithDispatch(){
+      let m = {}
+      for (const funcName in actions) {
+        m[funcName] = function (payload) {
+          const nestedActionFn = actions[funcName](payload)
+          nestedActionFn(dispatch, state)
+        }
+      }
+  
+      // return function of modified version
+      // that return with dispatch, and state inside actions
+      return m
+    }
+    
+    function dispatch(data){
+      return state.callback(data) 
+    }
+    
+    return (
+      <MyContext.Consumer>
+        { (value=> {
+              return (
+                <HOC {...props} {...value} {...actionsFn()}  />
+              )
+          })
+        }
+      </MyContext.Consumer>
+    )
+  }
+}
+export default connect
+
+```
+
+# Let' go Connect connect.jsx with our Component.
 
 ```jsx
 // ViewTodos.jsx
@@ -127,19 +184,27 @@ export default connect(ViewTodos, { deleteTodo })
 ## Let's go into our actions.js
 ```javascript
 // actions.js
+let lastUpdatedState = {} // store updated state... [important]
 export const deleteTodo = (todoId)=>{
   return function (dispatch, state){
-    // console.log(dispatch, state)
-    let updateState = {
-      ...state, todos: state.todos.filter(t=>t.id !== todoId)
-    }
-    dispatch(updateState)
+    // console.log(dispatch, oldState)
+    // console.log(dispatch())
+    lastUpdatedState = dispatch({
+      ...state,
+      ...lastUpdatedState,
+      todos: state.todos.filter(t=>t.id !== todoId)
+    })
   }
 }
 
-
-export const addTodo = (newTodo)=>(dispatch, state)=>{
-  dispatch({...state, todos: [...state.todos, newTodo]  })
+export function addTodo(newTodo){
+  return function (dispatch, state){
+    lastUpdatedState = dispatch({
+      ...state,
+      ...lastUpdatedState,
+      todos: [...state.todos, newTodo]
+    })
+  }
 }
 ``` 
 ## YaHu! It's Magic? No. its just Logic.
@@ -176,6 +241,23 @@ export default connect(AddTodo, { addTodo });
 
 
 
+#Async Action
+```js
+let lastUpdatedState = {}
+export const fetchProjects=()=>async(dispatch, state)=>{
+  axiosInstance.get("/api/projects").then(r=>{
+    const { data, status } = r
+    if(status < 400 && status >= 200 ) {
+      lastUpdatedState = dispatch({
+        ...state,
+        ...lastUpdatedState,
+        ...data
+      })
+    } else{
+      // ...
+    }
+  })
+}
 
-
+```
 

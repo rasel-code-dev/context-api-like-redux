@@ -1,0 +1,8 @@
+@import "src/scss/shared/breakpoint";
+
+.todo_view_component{
+  //@include bgred;
+  @include getDown(600px){
+    //background: red;
+  }
+}

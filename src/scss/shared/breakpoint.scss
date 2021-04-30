@@ -1,0 +1,15 @@
+
+
+//  break point down as pass width
+@mixin getDown($width) {
+  @media (max-width : #{$width}) {
+    @content;
+  }
+}
+
+//  break point up as pass width
+@mixin getUp($width) {
+  @media (max-width : #{$width}) {
+    @content;
+  }
+}
